@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface NoteDAO {
     String create(Note note);
-    NoteDto getNoteByHashtag(String hashtag);
+    List<NoteDto> getNotesByHashtag(String hashtag);
     List<NoteDto> listNotes();
     String delete(String name);
     String update(String name, String note);

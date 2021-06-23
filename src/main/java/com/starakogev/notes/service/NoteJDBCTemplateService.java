@@ -19,6 +19,11 @@ public class NoteJDBCTemplateService implements NoteDAO {
 
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * Create new note to DataBase
+     * @param note
+     * @return String(message of operation)
+     */
     @Override
     public String create(Note note) {
         String sql = "insert into notes_schema.notes (name, note, creation_date, hashtag) values (?, ?, ?, ?)";
@@ -27,17 +32,23 @@ public class NoteJDBCTemplateService implements NoteDAO {
         return "Создана заметка: " + "'" + note.getName() + "'";
     }
 
+    /**
+     * Find notes in Data Base by 'hashtag'
+     * @param hashtag
+     * @return List</NoteDto>
+     */
     @Override
-    public NoteDto getNoteByHashtag(String hashtag) {
+    public List<NoteDto> getNotesByHashtag(String hashtag) {
         String sql = "select * from notes_schema.notes where hashtag = ?";
-        Note note = jdbcTemplate.queryForObject(sql, new String[]{hashtag}, new NoteMapper());
-        return NoteDto.builder()
-                .name(note.getName())
-                .note(note.getNote())
-                .creationDate(note.getCreationDate())
-                .build();
+        List<Note> notes = jdbcTemplate.query(sql, new String[]{hashtag}, new NoteMapper());
+        return parseListNoteToDto(notes);
     }
 
+    /**
+     * Delete note from Data Base
+     * @param name
+     * @return String(message of operation)
+     */
     @Override
     public String delete(String name) {
         String sql = "delete from notes_schema.notes where name = ?";
@@ -45,6 +56,12 @@ public class NoteJDBCTemplateService implements NoteDAO {
         return "Заметка с именем: " + "'" + name + "'" + " was deleted!";
     }
 
+    /**
+     * Update note in Data Base
+     * @param name
+     * @param note
+     * @return String(message of operation)
+     */
     @Override
     public String update(String name, String note) {
         String sql = "update notes_schema.notes set note = ? where name = ?";
@@ -52,29 +69,38 @@ public class NoteJDBCTemplateService implements NoteDAO {
         return "Заметка с именем: " + "'" + name + "'" + " изменена";
     }
 
+    /**
+     * Find notes in Data Base by time params
+     * @param min
+     * @param max
+     * @return List</NoteDto>
+     */
     @Override
     public List<NoteDto> listNotesByTime(String min, String max) {
+        LocalDateTime minTime = LocalDateTime.parse(min);
+        LocalDateTime maxTime = LocalDateTime.parse(max);
         if (min == null && max == null) {
             return listNotes();
         } else if (min != null && max == null) {
-            LocalDateTime minTime = LocalDateTime.parse(min);
             String sql = "select * from notes_schema.notes where creation_date > ?";
             List<Note> notes = jdbcTemplate.query(sql, new LocalDateTime[]{minTime}, new NoteMapper());
             return parseListNoteToDto(notes);
         } else if (min == null) {
-            LocalDateTime maxTime = LocalDateTime.parse(max);
             String sql = "select * from notes_schema.notes where creation_date < ?";
             List<Note> notes = jdbcTemplate.query(sql, new LocalDateTime[]{maxTime}, new NoteMapper());
             return parseListNoteToDto(notes);
         } else {
-            LocalDateTime minTime = LocalDateTime.parse(min);
-            LocalDateTime maxTime = LocalDateTime.parse(max);
             String sql = "select * from notes_schema.notes where creation_date > ? and creation_date < ?";
             List<Note> notes = jdbcTemplate.query(sql, new LocalDateTime[]{minTime, maxTime}, new NoteMapper());
             return parseListNoteToDto(notes);
         }
     }
 
+    /**
+     * Find notes in Data Base by key words
+     * @param text
+     * @return List</NoteDto>
+     */
     @Override
     public List<NoteDto> getNoteByText(String text) {
         String word = text + ":*";
@@ -83,6 +109,10 @@ public class NoteJDBCTemplateService implements NoteDAO {
         return parseListNoteToDto(notes);
     }
 
+    /**
+     * Return all notes from Data Base
+     * @return List</NoteDto>
+     */
     @Override
     public List<NoteDto> listNotes() {
         String sql = "select * from notes_schema.notes";
@@ -90,6 +120,11 @@ public class NoteJDBCTemplateService implements NoteDAO {
         return parseListNoteToDto(notes);
     }
 
+    /**
+     * Parse Note entity to NoteDto for user interface
+     * @param notes
+     * @return List</NoteDto>
+     */
     public List<NoteDto> parseListNoteToDto(List<Note> notes){
         return notes.stream()
                 .map(note -> NoteDto.builder()
