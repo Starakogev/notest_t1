@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class NoteJDBCTemplateService implements NoteDAO {
 
     private final JdbcTemplate jdbcTemplate;
+    private final TimeService timeService;
 
     /**
      * Create new note to DataBase
@@ -37,7 +38,7 @@ public class NoteJDBCTemplateService implements NoteDAO {
         note.getHashtag().forEach(hashtag -> jdbcTemplate.update(sqlHashtag, hashtag));
         String sql = "insert into notes_schema.notes (name, note, creation_date) values (?, ?, ?) returning *";
         Note noteFromTable = jdbcTemplate.queryForObject(sql, new NoteMapper(), note.getName(), note.getNote(),
-                Timestamp.valueOf(LocalDateTime.now()));
+                Timestamp.valueOf(timeService.getCurrentTime()));
         String sqlHashtagNote = "insert into notes_schema.note_hashtag values (?, (select id from notes_schema.hashtag where hashtag.hashtag = ?))";
         note.getHashtag().forEach(hashtag -> jdbcTemplate.update(sqlHashtagNote, noteFromTable.getId(), hashtag));
         return true;
