@@ -18,7 +18,7 @@ datasource.url=${DATA_BASE_URL}
 HTTP запросы для работы с приложением
 1. Создание заметки
 POST http://"hostname"/create/note
-передать Body JSON
+передать в Body JSON
 {
     "name":"название заметки",
     "note":"текст заметки",

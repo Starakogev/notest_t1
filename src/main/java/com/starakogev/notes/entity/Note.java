@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,5 +17,4 @@ public class Note {
     private String name;
     private String note;
     private Timestamp creationDate;
-    private String hashtag;
 }

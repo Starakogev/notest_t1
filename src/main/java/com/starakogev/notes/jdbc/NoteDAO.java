@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface NoteDAO {
-    String create(Note note);
+    boolean create(NoteDto note);
     List<NoteDto> getNotesByHashtag(String hashtag);
     List<NoteDto> listNotes();
-    String delete(String name);
-    String update(String name, String note);
+    boolean delete(String name);
+    boolean update(String name, String note);
     List<NoteDto> listNotesByTime(String min, String max);
     List<NoteDto> getNoteByText(String text);
 }

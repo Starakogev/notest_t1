@@ -14,7 +14,6 @@ public class NoteMapper implements RowMapper<Note> {
         note.setName(resultSet.getString("name"));
         note.setNote(resultSet.getString("note"));
         note.setCreationDate(resultSet.getTimestamp("creation_date"));
-        note.setHashtag(resultSet.getString("hashtag"));
 
         return note;
     }

@@ -14,22 +14,25 @@ public class NoteManageController {
 
     private final NoteJDBCTemplateService noteJDBCTemplate;
 
-    //создать заметку (в REST-запросе при вводе параметра вместо пробела использовать нижнее подчеркивание)
+    //создать заметку
     @PostMapping("create/note")
-    public String createNote(@RequestBody Note note) {
-        return noteJDBCTemplate.create(note);
+    public String createNote(@RequestBody NoteDto note) {
+        noteJDBCTemplate.create(note);
+        return "Создана заметка: " + "'" + note.getName() + "'";
     }
 
     //удалить заметку
     @DeleteMapping("delete/note/{name}")
     public String deleteNoteByName(@PathVariable String name) {
-        return noteJDBCTemplate.delete(name);
+        noteJDBCTemplate.delete(name);
+        return "Заметка с именем: " + "'" + name + "'" + " was deleted!";
     }
 
     //изменить заметку
     @PutMapping("update/note/{name}")
     public String updateNote(@PathVariable String name, @RequestBody String note) {
-        return noteJDBCTemplate.update(name, note);
+        noteJDBCTemplate.update(name, note);
+        return "Заметка с именем: " + "'" + name + "'" + " изменена";
     }
 
     //отфильтровать заметки по дате создания
@@ -46,9 +49,8 @@ public class NoteManageController {
     }
 
     //отфильтровать заметки по хэштэгу
-    //TODO нужно реализовать правильную работу с #тэгами пока это только костыль бесполезный
     @GetMapping("find/notes/by-hashtag")
-    public List<NoteDto> getNotesByHashTag(@PathVariable String hashtag) {
+    public List<NoteDto> getNotesByHashTag(@RequestParam String hashtag) {
         return noteJDBCTemplate.getNotesByHashtag(hashtag);
     }
 }
